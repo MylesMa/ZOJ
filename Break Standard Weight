@@ -1,0 +1,137 @@
+Break Standard Weight
+
+
+The balance was the first mass measuring instrument invented. In its traditional form, it consists of a pivoted horizontal lever of equal length arms, called the beam, with a weighing pan, also called scale, suspended from each arm (which is the origin of the originally plural term "scales" for a weighing instrument). The unknown mass is placed in one pan, and standard masses are added to this or the other pan until the beam is as close to equilibrium as possible. The standard weights used with balances are usually labeled in mass units, which are positive integers.
+With some standard weights, we can measure several special masses object exactly, whose weight are also positive integers in mass units. For example, with two standard weights 1 and 5, we can measure the object with mass 1, 4, 5 or 6 exactly.
+In the beginning of this problem, there are 2 standard weights, which masses are x and y. You have to choose a standard weight to break it into 2 parts, whose weights are also positive integers in mass units. We assume that there is no mass lost. For example, the origin standard weights are 4 and 9, if you break the second one into 4 and 5, you could measure 7 special masses, which are 1, 3, 4, 5, 8, 9, 13. While if you break the first one into 1 and 3, you could measure 13 special masses, which are 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13! Your task is to find out the maximum number of possible special masses.
+
+Input
+
+There are multiple test cases. The first line of input is an integer T < 500 indicating the number of test cases. Each test case contains 2 integers x and y. 2 ≤ x, y ≤ 100
+
+Output
+
+For each test case, output the maximum number of possible special masses.
+
+Sample Input
+
+2
+4 9
+10 10
+Sample Output
+
+13
+9
+
+====================================================================
+
+#include <stdio.h>
+#include <iostream>
+#include <vector>
+#include <set>
+
+using std::vector;
+using std::set;
+using std::endl;
+
+void comb(const vector<int>& nums, int begin, int end, set<int>* ret) {
+  set<int> sub1;
+  set<int> sub2;
+
+  if (begin == end) {
+    ret->insert(nums[begin]);
+    return;
+  }
+
+  for (int i = begin; i <= end - 1; i++) {
+    sub1.clear();
+    sub2.clear();
+
+    comb(nums, begin, i, &sub1);
+    comb(nums, i + 1, end, &sub2);
+
+    set<int>::iterator it1 = sub1.begin();
+    set<int>::iterator it2 = sub2.begin();
+
+    for (; it1 != sub1.end(); ++it1) {
+      for (; it2 != sub2.end(); ++it2) {
+        ret->insert(*it1 + *it2);
+        ret->insert(*it1);
+        ret->insert(*it2);
+        if (*it1 > *it2) {
+          ret->insert(*it1 - *it2);
+        } else if (*it1 < *it2) {
+          ret->insert(*it2 - *it1);
+        }
+      }
+    }
+  }
+}
+
+void PrintMas(set<int> mas) {
+  set<int>::iterator it = mas.begin();
+
+  for (; it != mas.end(); ++it) {
+    std::cout << "\t" << *it;
+  }
+
+  std::cout << endl;
+}
+
+int maxPos(int num1, int num2) {
+  set<int> masses;
+  vector<int> nums;
+  int max = 1;
+
+  for (int j = 1; j <= num1 / 2; j++) {
+    nums.clear();
+    masses.clear();
+    nums.push_back(j);
+    nums.push_back(num1 - j);
+    nums.push_back(num2);
+
+    comb(nums, 0, nums.size() - 1, &masses);
+    if (masses.size() == num1 + num2) {
+      return num1 + num2;
+    }
+
+    if (max < masses.size()) {
+      max = masses.size();
+    }
+  }
+
+  for (int k = 1; k <= num2 / 2; k++) {
+    nums.clear();
+    masses.clear();
+    nums.push_back(num1);
+    nums.push_back(k);
+    nums.push_back(num2 - k);
+
+    comb(nums, 0, nums.size() - 1, &masses);
+    if (masses.size() == num1 + num2) {
+      return num1 + num2;
+    }
+
+    if (max < masses.size()) {
+      max = masses.size();
+    }
+  }
+
+  return max;
+}
+
+int main() {
+  int case_num;
+  int tmp;
+  tmp = scanf("%d", &case_num);
+
+  int num1, num2;
+  for (int i = 0; i < case_num; i++) {
+    tmp = scanf("%d %d", &num1, &num2);
+
+    int max = maxPos(num1, num2);
+    std::cout << max << endl;
+  }
+
+  return 0;
+}
