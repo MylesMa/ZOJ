@@ -1,0 +1,89 @@
+Java Beans
+
+There are N little kids sitting in a circle, each of them are carrying some java beans in their hand. Their teacher want to select M kids who seated in M consecutive seats and collect java beans from them.
+
+The teacher knows the number of java beans each kids has, now she wants to know the maximum number of java beans she can get from M consecutively seated kids. Can you help her?
+
+Input
+
+There are multiple test cases. The first line of input is an integer T indicating the number of test cases.
+
+For each test case, the first line contains two integers N (1 ≤ N ≤ 200) and M (1 ≤ M ≤ N). Here N and M are defined in above description. The second line of each test case contains N integers Ci (1 ≤ Ci ≤ 1000) indicating number of java beans the ith kid have.
+
+Output
+
+For each test case, output the corresponding maximum java beans the teacher can collect.
+
+Sample Input
+
+2
+5 2
+7 3 1 3 9
+6 6
+13 28 12 10 20 75
+Sample Output
+
+16
+158
+
+=============================================================================
+
+#include <stdio.h>
+#include <iostream>
+#include <vector>
+#include <set>
+
+using std::vector;
+using std::set;
+using std::endl;
+
+int main() {
+  int case_num;
+  int tmp;
+  tmp = scanf("%d", &case_num);
+
+  int max;
+  int sum;
+  int end;
+  vector<int> bean_count;
+  int bean;
+  int n, m;
+  for (int i = 0; i < case_num; i++) {
+    tmp = scanf("%d %d", &n, &m);
+    bean_count.clear();
+    for (int j = 0; j < n; j++) {
+      tmp = scanf("%d", &bean);
+      bean_count.push_back(bean);
+    }
+
+    max = 0;
+    sum = 0;
+    for (int j = 0; j < n; j++) {
+      if (j == 0) {
+        for (int k = j; k - j + 1 <= m; k++) {
+          sum += bean_count[k];
+        }
+        max = sum;
+        if (m == n) {
+          break;
+        }
+        continue;
+      }
+
+      sum -= bean_count[j - 1];
+      end = j + m - 1;
+      if (end >= n) {
+        end -= n;
+      }
+      sum += bean_count[end];
+
+      if (max < sum) {
+        max = sum;
+      }
+    }
+
+    printf("%d\n", max);
+  }
+
+  return 0;
+}
