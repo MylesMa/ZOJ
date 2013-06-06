@@ -1,0 +1,104 @@
+Hard to Play
+
+MightyHorse is playing a music game called osu!.
+
+
+After playing for several months, MightyHorse discovered the way of calculating score in osu!:
+
+1. While playing osu!, player need to click some circles following the rhythm. Each time a player clicks, it will have three different points: 300, 100 and 50, deciding by how clicking timing fits the music.
+
+2. Calculating the score is quite simple. Each time player clicks and gets P points, the total score will add P, which should be calculated according to following formula:
+
+P = Point * (Combo * 2 + 1)
+Here Point is the point the player gets (300, 100 or 50) and Combo is the number of consecutive circles the player gets points previously - That means if the player doesn't miss any circle and clicks the ith circle, Combo should be i - 1.
+
+Recently MightyHorse meets a high-end osu! player. After watching his replay, MightyHorse finds that the game is very hard to play. But he is more interested in another problem: What's the maximum and minimum total score a player can get if he only knows the number of 300, 100 and 50 points the player gets in one play?
+
+As the high-end player plays so well, we can assume that he won't miss any circle while playing osu!; Thus he can get at least 50 point for a circle.
+
+Input
+
+There are multiple test cases.
+
+The first line of input is an integer T (1 ≤ T ≤ 100), indicating the number of test cases.
+
+For each test case, there is only one line contains three integers: A (0 ≤ A ≤ 500) - the number of 300 point he gets, B (0 ≤ B ≤ 500) - the number of 100 point he gets and C (0 ≤ C ≤ 500) - the number of 50 point he gets.
+
+Output
+
+For each test case, output a line contains two integers, describing the minimum and maximum total score the player can get.
+
+Sample Input
+
+1
+2 1 1 
+Sample Output
+
+2050 3950
+
+===========================================================================
+
+#include <stdio.h>
+#include <iostream>
+#include <vector>
+#include <set>
+
+using std::vector;
+using std::set;
+using std::endl;
+
+int main() {
+  int case_num;
+  int tmp;
+  tmp = scanf("%d", &case_num);
+
+  int comb;
+  int hit_300;
+  int hit_100;
+  int hit_50;
+  int min;
+  int max;
+
+  for (int i = 0; i < case_num; i++) {
+    tmp = scanf("%d %d %d", &hit_300, &hit_100, &hit_50);
+    comb = 0;
+    min = 0;
+    max = 0;
+
+    for (int i = 0; i < hit_300; i++) {
+      min += 300 * (comb * 2 + 1);
+      comb++;
+    }
+
+    for (int i = 0; i < hit_100; i++) {
+      min += 100 * (comb * 2 + 1);
+      comb++;
+    }
+
+    for (int i = 0; i < hit_50; i++) {
+      min += 50 * (comb * 2 + 1);
+      comb++;
+    }
+
+    comb = 0;
+
+    for (int i = 0; i < hit_50; i++) {
+      max += 50 * (comb * 2 + 1);
+      comb++;
+    }
+
+    for (int i = 0; i < hit_100; i++) {
+      max += 100 * (comb * 2 + 1);
+      comb++;
+    }
+
+    for (int i = 0; i < hit_300; i++) {
+      max += 300 * (comb * 2 + 1);
+      comb++;
+    }
+
+    printf("%d %d\n", min, max);
+  }
+
+  return 0;
+}
