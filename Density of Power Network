@@ -1,0 +1,94 @@
+Density of Power Network
+
+The vast power system is the most complicated man-made system and the greatest engineering innovation in the 20th century. The following diagram shows a typical 14 bus power system. In real world, the power system may contains hundreds of buses and thousands of transmission lines.
+
+
+Network topology analysis had long been a hot topic in the research of power system. And network density is one key index representing the robustness of power system. And you are asked to implement a procedure to calculate the network density of power system.
+
+The network density is defined as the ratio between number of transmission lines and the number of buses. Please note that if two or more transmission lines connecting the same pair of buses, only one would be counted in the topology analysis.
+
+Input
+
+The first line contains a single integer T (T ≤ 1000), indicating there are T cases in total.
+
+Each case begins with two integers N and M (2 ≤ N, M ≤ 500) in the first line, representing the number of buses and the number of transmission lines in the power system. Each Bus would be numbered from 1 to N.
+
+The second line contains the list of start bus number of the transmission lines, separated by spaces.
+
+The third line contains the list of corresponding end bus number of the transmission lines, separated by spaces. The end bus number of the transmission lines would not be the same as the start bus number.
+
+Output
+
+Output the network density of the power system in a single line, as defined in above. The answer should round to 3 digits after decimal point.
+
+Sample Input
+
+3
+3 2
+1 2
+2 3
+2 2
+1 2
+2 1
+14 20
+2 5 3 4 5 4 5 7 9 6 11 12 13 8 9 10 14 11 13 13
+1 1 2 2 2 3 4 4 4 5 6 6 6 7 7 9 9 10 12 14
+Sample Output
+
+0.667
+0.500
+1.429
+
+=============================================================================
+
+#include <stdio.h>
+#include <iostream>
+#include <vector>
+#include <set>
+
+using std::vector;
+using std::set;
+using std::endl;
+
+int main() {
+  int case_num;
+  int tmp;
+  tmp = scanf("%d", &case_num);
+
+  int bus_num, trans_num, start, end;
+  vector<int> start_list;
+  vector<int> end_list;
+  int count;
+
+  for (int i = 0; i < case_num; i++) {
+    tmp = scanf("%d %d", &bus_num, &trans_num);
+    vector<vector<bool> > trans(bus_num + 1, vector<bool>(bus_num + 1, false));
+    start_list.clear();
+    end_list.clear();
+
+    for (int j = 0; j < trans_num; j++) {
+      tmp = scanf("%d", &start);
+      start_list.push_back(start);
+    }
+
+    for (int j = 0; j < trans_num; j++) {
+      tmp = scanf("%d", &end);
+      end_list.push_back(end);
+    }
+
+    count = 0;
+    for (int j = 0; j < trans_num; j++) {
+      if (!trans[start_list[j]][end_list[j]] &&
+          !trans[end_list[j]][start_list[j]]) {
+        count++;
+        trans[start_list[j]][end_list[j]] = true;
+        trans[end_list[j]][start_list[j]] = true;
+      }
+    }
+
+    printf("%f\n", 1.0f * count / bus_num);
+
+  }
+
+  return 0;
+}
