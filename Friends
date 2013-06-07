@@ -1,0 +1,119 @@
+Friends
+
+Alice lives in the country where people like to make friends. The friendship is bidirectional and if any two person have no less than k friends in common, they will become friends in several days. Currently, there are totally n people in the country, and m friendship among them. Assume that any new friendship is made only when they have sufficient friends in common mentioned above, you are to tell how many new friendship are made after a sufficiently long time.
+
+Input
+
+There are multiple test cases.
+
+The first lien of the input contains an integer T (about 100) indicating the number of test cases. Then T cases follow. For each case, the first line contains three integers n, m, k (1 ≤ n ≤ 100, 0 ≤ m ≤ n×(n-1)/2, 0 ≤ k ≤ n, there will be no duplicated friendship) followed by m lines showing the current friendship. The ith friendship contains two integers ui, vi (0 ≤ ui, vi < n, ui ≠ vi) indicating there is friendship between person ui and vi.
+
+Note: The edges in test data are generated randomly.
+
+Output
+
+For each case, print one line containing the answer.
+
+Sample Input
+
+3
+4 4 2
+0 1
+0 2
+1 3
+2 3
+5 5 2
+0 1
+1 2
+2 3
+3 4
+4 0
+5 6 2
+0 1
+1 2
+2 3
+3 4
+4 0
+2 0
+Sample Output
+
+2
+0
+4
+
+=============================================================
+
+#include <stdio.h>
+#include <iostream>
+#include <vector>
+#include <map>
+#include <set>
+
+using std::vector;
+using std::set;
+using std::map;
+using std::endl;
+
+bool HasKConsections(int k, const set<int>& u, const set<int>& v) {
+  set<int>::iterator iter_u = u.begin();
+  int count = 0;
+  for (; iter_u != u.end(); ++iter_u) {
+    if (v.count(*iter_u) > 0) {
+      count++;
+    }
+  }
+
+  return count >= k;
+}
+
+int main() {
+  int case_num;
+  int tmp;
+  tmp = scanf("%d", &case_num);
+
+  int n, m, k;
+  int u, v;
+  int new_friend;
+  map<int, set<int> > friend_set;
+  for (int i = 0; i < case_num; i++) {
+    tmp = scanf("%d %d %d", &n, &m, &k);
+    friend_set.clear();
+    new_friend = 0;
+
+    for (int j = 0; j < m; j++) {
+      tmp = scanf("%d %d", &u, &v);
+      friend_set[u].insert(v);
+      friend_set[v].insert(u);
+    }
+
+    bool flag = true;
+    while (flag) {
+      flag = false;
+      for (u = 0; u < n; u++) {
+        if (friend_set[u].size() < k ||
+            friend_set[u].size() == n - 1) {
+          continue;
+        }
+
+        for (v = u + 1; v < n; v++) {
+          if (friend_set[v].size() < k ||
+              friend_set[v].size() == n - 1) {
+            continue;
+          }
+
+          if (friend_set[u].count(v) == 0 &&
+              HasKConsections(k, friend_set[u], friend_set[v])) {
+            flag = true;
+            new_friend++;
+            friend_set[u].insert(v);
+            friend_set[v].insert(u);
+          }
+        }
+      }
+    }
+
+    printf("%d\n", new_friend);
+  }
+
+  return 0;
+}
