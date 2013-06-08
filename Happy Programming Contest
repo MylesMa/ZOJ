@@ -1,0 +1,136 @@
+Happy Programming Contest
+
+In Zhejiang University Programming Contest, a team is called "couple team" if it consists of only two students loving each other. In the contest, the team will get a lovely balloon with unique color for each problem they solved. Since the girl would prefer pink balloon rather than black balloon, each color is assigned a value to measure its attractiveness. Usually, the boy is good at programming while the girl is charming. The boy wishes to solve problems as many as possible. However, the girl cares more about the lovely balloons. Of course, the boy's primary goal is to make the girl happy rather than win a prize in the contest.
+
+Suppose for each problem, the boy already knows how much time he needs to solve it. Please help him make a plan to solve these problems in strategic order so that he can maximize the total attractiveness value of balloons they get before the contest ends. Under this condition, he wants to solve problems as many as possible. If there are many ways to achieve this goal, he needs to minimize the total penalty time. The penalty time of a problem is equal to the submission time of the correct solution. We assume that the boy is so clever that he always submit the correct solution.
+
+Input
+
+The first line of input is an integer N (N < 50) indicating the number of test cases. For each case, first there is a line containing 2 integers T (T <= 1000) and n (n <= 50) indicating the contest length and the number of problems. The next line contains n integers and the i-th integer ti (ti <= 1000) represents the time needed to solve the ith problem. Finally, there is another line containing n integers and the i-th integer vi (vi <= 1000) represents the attractiveness value of the i-th problem. Time is measured in minutes.
+
+Output
+
+For each case, output a single line containing 3 integers in this order: the total attractiveness value, the number of problems solved, the total penalty time. The 3 integers should be separated by a space.
+
+Sample Input
+
+2
+300 10
+10 10 10 10 10 10 10 10 10 10
+1 2 3 4 5 6 7 8 9 10
+300 10
+301 301 301 301 301 301 301 301 301 301
+1000 1000 1000 1000 1000 1000 1000 1000 1000 1000
+
+Sample Output
+
+55 10 550
+0 0 0
+
+=====================================================================
+
+#include <algorithm>
+#include <iostream>
+#include <map>
+#include <set>
+#include <stdio.h>
+#include <vector>
+
+using std::vector;
+using std::set;
+using std::map;
+using std::endl;
+
+struct Problem {
+int time;
+int att;
+};
+
+static bool comp(Problem prob1, Problem prob2) {
+  return prob1.time < prob2.time;
+}
+
+int main() {
+  int case_num;
+  int tmp;
+  tmp = scanf("%d", &case_num);
+
+  int t, n;
+  vector<int> time;
+  vector<int> att;
+  vector<Problem> problem_list;
+
+  while (case_num-- > 0) {
+    tmp = scanf("%d %d", &t, &n);
+
+    if (n == 0) {
+      printf("0 0 0\n");
+      continue;
+    }
+
+    problem_list.clear();
+
+    for (int i = 0; i < n; i++) {
+      Problem problem;
+      tmp = scanf("%d", &problem.time);
+
+      problem_list.push_back(problem);
+    }
+    
+    for (int i = 0; i < n; i++) {
+      tmp = scanf("%d", &problem_list[i].att);
+    }
+
+    std::sort(problem_list.begin(), problem_list.end(), comp);
+
+    vector<vector<int> > dp_att(n, vector<int>(t + 1, 0));
+    vector<vector<int> > dp_penalty(n, vector<int>(t + 1, 0));
+    vector<vector<int> > dp_total(n, vector<int>(t + 1, 0));
+    vector<vector<int> > dp_count(n, vector<int>(t + 1, 0));
+
+    for (int j = 0; j <= t; j++) {
+      if (j >= problem_list[0].time) {
+        dp_att[0][j] = problem_list[0].att;
+        dp_penalty[0][j] = problem_list[0].time;
+        dp_total[0][j] = problem_list[0].time;
+        dp_count[0][j] = 1;
+      }
+    }
+
+    for (int i = 1; i < n; i++) {
+      for (int j = 0; j <= t; j++) {
+        if (j >= problem_list[i].time) {
+          int att1 = dp_att[i - 1][j];
+          int att2 = dp_att[i - 1][j - problem_list[i].time] + problem_list[i].att;
+          int pen1 = dp_penalty[i - 1][j];
+          int pen2 = dp_penalty[i - 1][j - problem_list[i].time] + problem_list[i].time;
+          int count1 = dp_count[i - 1][j];
+          int count2 = dp_count[i - 1][j - problem_list[i].time] + 1;
+
+          if (att1 > att2 ||
+              (att1 == att2 && count1 > count2) ||
+              (att1 == att2 && count1 == count2 && pen1 < pen2)) {
+            dp_att[i][j] = att1;
+            dp_penalty[i][j] = pen1;
+            dp_total[i][j] = dp_total[i - 1][j];
+            dp_count[i][j] = count1;
+          } else {
+            dp_att[i][j] = att2;
+            dp_penalty[i][j] = pen2;
+            dp_total[i][j] = dp_total[i - 1][j - problem_list[i].time] + dp_penalty[i][j];
+            dp_count[i][j] = count2;
+          }
+        } else {
+          dp_att[i][j] = dp_att[i - 1][j];
+          dp_penalty[i][j] = dp_penalty[i - 1][j];
+          dp_total[i][j] = dp_total[i - 1][j];
+          dp_count[i][j] = dp_count[i - 1][j];
+        }
+      }
+    }
+
+    printf("%d %d %d\n", dp_att[n - 1][t], dp_count[n - 1][t], dp_total[n - 1][t]);
+  }
+
+  return 0;
+}
